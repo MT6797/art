@@ -91,10 +91,6 @@
   V(L2d, double, int64_t) \
   V(Fmodf, float, float, float) \
   V(L2f, float, int64_t) \
-  V(Ipow32, int32_t, int32_t, int32_t) \
-  V(Ipow64, int64_t, int64_t, int64_t) \
-  V(Fpow, double, double, double) \
-  V(Fpowf, float, float, float) \
   V(D2iz, int32_t, double) \
   V(F2iz, int32_t, float) \
   V(Idivmod, int32_t, int32_t, int32_t) \
@@ -150,7 +146,12 @@
   V(NewStringFromStringBuffer, void) \
   V(NewStringFromStringBuilder, void) \
 \
-  V(ReadBarrierJni, void, mirror::CompressedReference<mirror::Object>*, Thread*)
+  V(ReadBarrierJni, void, mirror::CompressedReference<mirror::Object>*, Thread*) \
+\
+  V(Ipow32, int32_t, int32_t, int32_t) \
+  V(Ipow64, int64_t, int64_t, int64_t) \
+  V(Fpow, double, double, double) \
+  V(Fpowf, float, float, float)
 #else
 #define QUICK_ENTRYPOINT_LIST(V) \
   V(AllocArray, void*, uint32_t, int32_t, ArtMethod*) \

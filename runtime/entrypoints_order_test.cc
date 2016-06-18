@@ -236,15 +236,7 @@ class EntrypointsOrderTest : public CommonRuntimeTest {
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pFmod, pL2d, sizeof(void*));
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pL2d, pFmodf, sizeof(void*));
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pFmodf, pL2f, sizeof(void*));
-#ifdef MTK_ART_COMMON
-    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pL2f, pIpow32, sizeof(void*));
-    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pIpow32, pIpow64, sizeof(void*));
-    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pIpow64, pFpow, sizeof(void*));
-    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pFpow, pFpowf, sizeof(void*));
-    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pFpowf, pD2iz, sizeof(void*));
-#else
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pL2f, pD2iz, sizeof(void*));
-#endif
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pD2iz, pF2iz, sizeof(void*));
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pF2iz, pIdivmod, sizeof(void*));
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pIdivmod, pD2l, sizeof(void*));
@@ -319,8 +311,17 @@ class EntrypointsOrderTest : public CommonRuntimeTest {
     EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pNewStringFromStringBuilder, pReadBarrierJni,
                          sizeof(void*));
 
+#ifdef MTK_ART_COMMON
+    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pReadBarrierJni, pIpow32, sizeof(void*));
+    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pIpow32, pIpow64, sizeof(void*));
+    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pIpow64, pFpow, sizeof(void*));
+    EXPECT_OFFSET_DIFFNP(QuickEntryPoints, pFpow, pFpowf, sizeof(void*));
+    CHECKED(OFFSETOF_MEMBER(QuickEntryPoints, pFpowf)
+            + sizeof(void*) == sizeof(QuickEntryPoints), QuickEntryPoints_all);
+#else
     CHECKED(OFFSETOF_MEMBER(QuickEntryPoints, pReadBarrierJni)
             + sizeof(void*) == sizeof(QuickEntryPoints), QuickEntryPoints_all);
+#endif
   }
 };
 

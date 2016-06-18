@@ -44,7 +44,7 @@
 namespace art {
 
 static constexpr uint64_t kLongThreadSuspendThreshold = MsToNs(5);
-static constexpr uint64_t kThreadSuspendTimeoutMs = 300 * 1000;  // 30s.
+static constexpr uint64_t kThreadSuspendTimeoutMs = 30 * 1000;  // 30s.
 // Use 0 since we want to yield to prevent blocking for an unpredictable amount of time.
 static constexpr useconds_t kThreadSuspendInitialSleepUs = 0;
 static constexpr useconds_t kThreadSuspendMaxYieldUs = 3000;
