@@ -49,6 +49,9 @@ void HInliner::Run() {
     // doing some logic in the runtime to discover if a method could have been inlined.
     return;
   }
+#ifdef MTK_ART_COMMON
+  graph_->InitRecordStat(kMtkOptimizingOptStat3);
+#endif
   const GrowableArray<HBasicBlock*>& blocks = graph_->GetReversePostOrder();
   for (size_t i = 0; i < blocks.Size(); ++i) {
     HBasicBlock* block = blocks.Get(i);
@@ -75,6 +78,10 @@ void HInliner::Run() {
       instruction = next;
     }
   }
+#ifdef MTK_ART_COMMON
+  int32_t opted = graph_->GetRecordStat(kMtkOptimizingOptStat3);
+  MaybeRecordStat(kMtkOptimizingOptStat3, opted);
+#endif
 }
 
 bool HInliner::TryInline(HInvoke* invoke_instruction, uint32_t method_index) const {

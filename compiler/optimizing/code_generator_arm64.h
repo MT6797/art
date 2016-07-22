@@ -141,7 +141,7 @@ class InvokeDexCallingConventionVisitorARM64 : public InvokeDexCallingConvention
 class Arm64AsmWrapper {
  public:
   explicit Arm64AsmWrapper(CodeGeneratorARM64* codegen)
-      : codegen_(codegen) {}
+      : codegen_(codegen), wrapper_status_(0) {}
 
   #define MACRO_LIST(V)  \
     V(B, 1, vixl::Label*, label)  \
@@ -216,6 +216,7 @@ class Arm64AsmWrapper {
     V(Drop, 1, const vixl::Operand&, size)  \
     V(Bind, 1, vixl::Label*, label)  \
     V(FinalizeCode, 0)  \
+    V(Dup, 3, vixl::VRegister, vd, vixl::VRegister, vn, int, vn_index)
 
   #define DECLARE_ASM_WRAPPER_FUNC_0(NAME, ...)                           \
     void NAME();
@@ -235,8 +236,12 @@ class Arm64AsmWrapper {
     MACRO_LIST(DECLARE_ASM_WRAPPER_FUNC)
   #undef DECLARE_ASM_WRAPPER_FUNC
 
+  void SetWrapperStatus(int status) { wrapper_status_ = status; }
+  int GetWrapperStatus() { return wrapper_status_; }
+
  private:
   CodeGeneratorARM64* const codegen_;
+  int wrapper_status_;
 };
 #endif
 

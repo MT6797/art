@@ -365,7 +365,7 @@ uintptr_t ArtMethod::NativeQuickPcOffset(const uintptr_t pc, const void* quick_e
 }
 #endif
 
-#ifdef MTK_ART_COMMON
+#ifdef MTK_ART_PROFILER
 __attribute__((weak))
 void ArtMethod::ProfIntm() {
   // Not implemented
@@ -385,7 +385,7 @@ void ArtMethod::Invoke(Thread* self, uint32_t* args, uint32_t args_size, JValue*
     CHECK_STREQ(GetInterfaceMethodIfProxy(sizeof(void*))->GetShorty(), shorty);
   }
 
-#ifdef MTK_ART_COMMON
+#ifdef MTK_ART_PROFILER
   ProfIntm();
 #endif
 

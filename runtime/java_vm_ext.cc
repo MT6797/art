@@ -39,7 +39,7 @@
 #include "scoped_thread_state_change.h"
 #include "thread-inl.h"
 #include "thread_list.h"
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
 #include "mt_aee_helper.h"
 #endif
 
@@ -395,7 +395,7 @@ void JavaVMExt::JniAbort(const char* jni_function_name, const char* msg) {
   std::ostringstream os;
   os << "JNI DETECTED ERROR IN APPLICATION: " << msg;
 
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
   std::ostringstream os2;
   if (strstr(msg, "input is not valid Modified UTF-8"))  {
     os2 << "JNI DETECTED ERROR IN APPLICATION: input is not valid Modified UTF-8";
@@ -406,27 +406,27 @@ void JavaVMExt::JniAbort(const char* jni_function_name, const char* msg) {
 
   if (jni_function_name != nullptr) {
     os << "\n    in call to " << jni_function_name;
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
     os2 << "\n    in call to " << jni_function_name;
 #endif
   }
   // TODO: is this useful given that we're about to dump the calling thread's stack?
   if (current_method != nullptr) {
     os << "\n    from " << PrettyMethod(current_method);
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
     os2 << "\n    from " << PrettyMethod(current_method);
 #endif
   }
   os << "\n";
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
   os2 << "\n";
 #endif
 
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
   std::string aee_msg = os2.str();
 #endif
   self->Dump(os);
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
   LOG(ERROR) << os.str();
   if (current_method != nullptr) {
     run_aee(current_method, aee_msg);

@@ -2566,6 +2566,13 @@ class CheckJNI {
           result_check = "D";
           break;
         case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+        case Primitive::kVectorDoublex2:
+        case Primitive::kVectorFloatx4:
+        case Primitive::kVectorInt32x4:
+        case Primitive::kVectorInt16x8:
+        case Primitive::kVectorInt8x16:
+#endif
           LOG(FATAL) << "Unexpected type: " << type;
           break;
       }
@@ -2651,6 +2658,13 @@ class CheckJNI {
           }
           break;
         case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+        case Primitive::kVectorDoublex2:
+        case Primitive::kVectorFloatx4:
+        case Primitive::kVectorInt32x4:
+        case Primitive::kVectorInt16x8:
+        case Primitive::kVectorInt8x16:
+#endif
           LOG(FATAL) << "Unexpected type: " << type;
           break;
       }

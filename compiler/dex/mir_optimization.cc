@@ -51,9 +51,6 @@ void MIRGraph::SetConstant(int32_t ssa_reg, int32_t value) {
   reg_location_[ssa_reg].is_const = true;
 }
 
-#ifdef MTK_ART_COMMON
-__attribute__((weak))
-#endif
 void MIRGraph::SetConstantWide(int32_t ssa_reg, int64_t value) {
   is_constant_v_->SetBit(ssa_reg);
   is_constant_v_->SetBit(ssa_reg + 1);

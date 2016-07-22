@@ -17,7 +17,7 @@
 #ifndef ART_RUNTIME_MT_AEE_HELPER_H_
 #define ART_RUNTIME_MT_AEE_HELPER_H_
 
-#ifdef CHECK_JNI_HAVE_AEE_FEATURE
+#ifdef MTK_ART_CHECK_JNI_HAVE_AEE_FEATURE
 #include "aee.h"
 #include <iostream>
 #include <iterator>

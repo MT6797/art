@@ -589,6 +589,13 @@ void BuildQuickShadowFrameVisitor::Visit() {
       sf_->SetVReg(cur_reg_, *reinterpret_cast<jint*>(GetParamAddress()));
       break;
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "UNREACHABLE";
       UNREACHABLE();
   }
@@ -704,6 +711,13 @@ void BuildQuickArgumentVisitor::Visit() {
       val.i = *reinterpret_cast<jint*>(GetParamAddress());
       break;
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "UNREACHABLE";
       UNREACHABLE();
   }
@@ -1761,6 +1775,13 @@ void BuildGenericJniFrameVisitor::Visit() {
       sm_.AdvanceInt(*reinterpret_cast<jint*>(GetParamAddress()));
       break;
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "UNREACHABLE";
       UNREACHABLE();
   }

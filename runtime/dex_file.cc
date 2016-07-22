@@ -289,17 +289,6 @@ std::unique_ptr<const DexFile> DexFile::Open(const ZipArchive& zip_archive, cons
   std::unique_ptr<ZipEntry> zip_entry(zip_archive.Find(entry_name, error_msg));
   if (zip_entry.get() == nullptr) {
     *error_code = ZipOpenErrorCode::kEntryNotFound;
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] ZIP Entry not found. FAILED APP:" << location;
-    }
-#endif
-
     return nullptr;
   }
   std::unique_ptr<MemMap> map(zip_entry->ExtractToMemMap(location.c_str(), entry_name, error_msg));
@@ -307,17 +296,6 @@ std::unique_ptr<const DexFile> DexFile::Open(const ZipArchive& zip_archive, cons
     *error_msg = StringPrintf("Failed to extract '%s' from '%s': %s", entry_name, location.c_str(),
                               error_msg->c_str());
     *error_code = ZipOpenErrorCode::kExtractToMemoryError;
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] ZIP ExtractToMemMap Failed. FAILED APP:" << location;
-    }
-#endif
-
     return nullptr;
   }
   std::unique_ptr<const DexFile> dex_file(OpenMemory(location, zip_entry->GetCrc32(), map.release(),
@@ -326,51 +304,17 @@ std::unique_ptr<const DexFile> DexFile::Open(const ZipArchive& zip_archive, cons
     *error_msg = StringPrintf("Failed to open dex file '%s' from memory: %s", location.c_str(),
                               error_msg->c_str());
     *error_code = ZipOpenErrorCode::kDexFileError;
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      unsigned int temp_crc = zip_entry->GetCrc32();
-      LOG(FATAL) << "[MTK_DEX_ABORT] Failed to open dex file. FAILED APP:" << location <<"ZIP CRC:"<< temp_crc;
-    }
-#endif
-
     return nullptr;
   }
   if (!dex_file->DisableWrite()) {
     *error_msg = StringPrintf("Failed to make dex file '%s' read only", location.c_str());
     *error_code = ZipOpenErrorCode::kMakeReadOnlyError;
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] Failed to make dex file. FAILED APP:" << location;
-    }
-#endif
-
     return nullptr;
   }
   CHECK(dex_file->IsReadOnly()) << location;
   if (!DexFileVerifier::Verify(dex_file.get(), dex_file->Begin(), dex_file->Size(),
                                location.c_str(), error_msg)) {
     *error_code = ZipOpenErrorCode::kVerifyError;
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] Failed to Verify Dex files. FAILED APP:" << location;
-    }
-#endif
-
     return nullptr;
   }
   *error_code = ZipOpenErrorCode::kNoError;
@@ -443,16 +387,6 @@ std::unique_ptr<const DexFile> DexFile::OpenMemory(const uint8_t* base,
   std::unique_ptr<DexFile> dex_file(
       new DexFile(base, size, location, location_checksum, mem_map, oat_dex_file));
   if (!dex_file->Init(error_msg)) {
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::size_t found = location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[San]  DexFile::OpenMemory MAGIC FAILED. FAILED APP:" << location <<" BASE:"<< base <<" SIZE:"<< size;
-    }
-#endif
-
     dex_file.reset();
   }
   return std::unique_ptr<const DexFile>(dex_file.release());

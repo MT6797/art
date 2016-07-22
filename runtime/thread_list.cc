@@ -88,6 +88,12 @@ bool ThreadList::Contains(pid_t tid) {
   return false;
 }
 
+#if MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+std::list<Thread*>::iterator ThreadList::FindThread(Thread* thread) {
+  return find(list_.begin(), list_.end(), thread);
+}
+#endif
+
 pid_t ThreadList::GetLockOwner() {
   return Locks::thread_list_lock_->GetExclusiveOwnerTid();
 }
@@ -1136,7 +1142,12 @@ void ThreadList::Unregister(Thread* self) {
     // thread_suspend_count_lock_ so that the unregistering thread cannot be suspended.
     // Note: deliberately not using MutexLock that could hold a stale self pointer.
     MutexLock mu(self, *Locks::thread_list_lock_);
+#if MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+    std::list<Thread*>::iterator it = FindThread(self);
+    if (it == list_.end()) {
+#else
     if (!Contains(self)) {
+#endif
       std::string thread_name;
       self->GetThreadName(thread_name);
       std::ostringstream os;
@@ -1146,7 +1157,11 @@ void ThreadList::Unregister(Thread* self) {
     } else {
       MutexLock mu2(self, *Locks::thread_suspend_count_lock_);
       if (!self->IsSuspended()) {
+#if MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+        list_.erase(it);
+#else
         list_.remove(self);
+#endif
         break;
       }
     }

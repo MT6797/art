@@ -258,6 +258,10 @@ ifeq ($(MTK_ART_OPT_ENABLE),)
   MTK_ART_OPT_ENABLE := true
 endif
 
+ifndef MTK_ART_ENABLE_CHECK_JNI_HAVE_AEE_FEATURE
+  MTK_ART_ENABLE_CHECK_JNI_HAVE_AEE_FEATURE := true
+endif
+
 #
 # MTK ART optimization features
 #
@@ -271,9 +275,9 @@ ifeq ($(MTK_ART_OPT_ENABLE),true)
   # Wrapper for debugging
   MTK_CFLAGS += -DMTK_ART_WRAPPER
 
-  #ifeq ($(MTK_ART_PROFILER_ENABLE),true)
+  ifeq ($(MTK_ART_PROFILER_ENABLE),true)
     MTK_CFLAGS += -DMTK_ART_PROFILER
-  #endif
+  endif
 
   # Set default compiler backend
   MTK_ART_COMPILER_BACKEND := optimizing
@@ -295,13 +299,13 @@ ifeq ($(HOST_OS),linux)
       ifndef SANITIZE_HOST
         art_host_non_debug_cflags += -Wframe-larger-than=2700
       endif
-      art_target_non_debug_cflags += -Wframe-larger-than=2000
+      art_target_non_debug_cflags += -Wframe-larger-than=2352
     endif
   endif
 endif
 
 #
-#MTK dex2oat suspend all active threads before fatal exit
+# MTK dex2oat suspend all active threads before fatal exit
 #
 MTK_SUSPEND_ALL_ACTIVE_THREADS_BEFORE_EXIT_ENABLE := true
 ifeq ($(MTK_SUSPEND_ALL_ACTIVE_THREADS_BEFORE_EXIT_ENABLE),true)
@@ -309,11 +313,37 @@ ifeq ($(MTK_SUSPEND_ALL_ACTIVE_THREADS_BEFORE_EXIT_ENABLE),true)
 endif
 
 #
-#MTK ART dex related issues active abort
+# MTK fix ART thread list memory leakage
 #
-MTK_ART_DEX_ACTIVE_ABORT_ENABLE := false
-ifeq ($(MTK_ART_DEX_ACTIVE_ABORT_ENABLE),true)
-  MTK_CFLAGS += -DMTK_ART_DEX_ACTIVE_ABORT
+ifndef MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+  MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE := true
+endif
+
+ifeq ($(MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE),true)
+  MTK_CFLAGS += -DMTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+endif
+
+#
+# MTK use interpret-only on dual-core cpu device
+#
+ifndef MTK_ART_USE_INT_ON_DUALCORE
+  MTK_ART_USE_INT_ON_DUALCORE := true
+endif
+
+ifeq ($(MTK_ART_USE_INT_ON_DUALCORE),true)
+  MTK_CFLAGS += -DMTK_ART_USE_INT_ON_DUALCORE
+endif
+
+#
+# MTK Google patch for Recognize cortex-a53.a57
+# to pass Google ART gtest
+#
+ifndef MTK_ART_GOOGLE_ADD_CORTEX_A53_A57
+  MTK_ART_GOOGLE_ADD_CORTEX_A53_A57 := true
+endif
+
+ifeq ($(MTK_ART_GOOGLE_ADD_CORTEX_A53_A57),true)
+  MTK_CFLAGS += -DMTK_ART_GOOGLE_ADD_CORTEX_A53_A57
 endif
 
 ART_HOST_CFLAGS += $(MTK_CFLAGS)

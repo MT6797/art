@@ -357,8 +357,6 @@ else
 endif
 
 ifeq ($(MTK_GMO_RAM_OPTIMIZE),yes)
-# MTK: JAVA heap uses DLMALLOC to increase available memory after boot idle.
-#  LIBART_CFLAGS += -DMTK_JAVA_HEAP_USE_DLMALLOC
 # MTK: Avoid race condition between Heap::TransitionCollector() and Heap::ClampGrowthLimit()
   LIBART_CFLAGS += -DMTK_FIX_GMO_BUG_CLAMPGROWLIMIT
 endif #MTK_GMO_RAM_OPTIMIZE
@@ -506,7 +504,9 @@ $$(ENUM_OPERATOR_OUT_GEN): $$(GENERATED_SRC_DIR)/%_operator_out.cc : $(LOCAL_PAT
     ifeq ($(HAVE_AEE_FEATURE),yes)
       LOCAL_SHARED_LIBRARIES += libaed
       LOCAL_C_INCLUDES += $(MTK_PATH_SOURCE)/external/aee/binary/inc
-      LOCAL_CFLAGS += -DCHECK_JNI_HAVE_AEE_FEATURE
+      ifeq ($(MTK_ART_ENABLE_CHECK_JNI_HAVE_AEE_FEATURE),true)
+        LOCAL_CFLAGS += -DMTK_ART_CHECK_JNI_HAVE_AEE_FEATURE=1
+      endif
       LOCAL_CFLAGS += -DMTK_ART_DONT_DUMP_NATIVE_STACK_FOR_LARGE_PROCESS
     endif
   endif

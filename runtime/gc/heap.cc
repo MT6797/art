@@ -587,11 +587,6 @@ void Heap::CreateMainMallocSpace(MemMap* mem_map, size_t initial_size, size_t gr
     RemoveRememberedSet(main_space_);
   }
   const char* name = kUseRosAlloc ? kRosAllocSpaceName[0] : kDlMallocSpaceName[0];
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-  LOG(WARNING) << "GMO Malloc Space Name:" << name;
-#else
-  LOG(WARNING) << "Malloc Space Name:" << name;
-#endif
   main_space_ = CreateMallocSpaceFromMemMap(mem_map, initial_size, growth_limit, capacity, name,
                                             can_move_objects);
   SetSpaceAsDefault(main_space_);
@@ -1984,18 +1979,9 @@ void Heap::TransitionCollector(CollectorType collector_type) {
         bump_pointer_space_ = nullptr;
         const char* name = kUseRosAlloc ? kRosAllocSpaceName[1] : kDlMallocSpaceName[1];
         // Temporarily unprotect the backup mem map so rosalloc can write the debug magic number.
-        // For MTK_JAVA_HEAP_USE_DLMALLOC, Temporarily unprotect the backup mem map so dlmalloc can memset 0
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-        // if (kIsDebugBuild && kUseRosAlloc) {
-#else
         if (kIsDebugBuild && kUseRosAlloc) {
-#endif
           mem_map->Protect(PROT_READ | PROT_WRITE);
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-        // }
-#else
         }
-#endif
 
 #if defined (HAVE_ANDROID_OS) && defined(MTK_FIX_GMO_BUG_CLAMPGROWLIMIT)
         main_space_backup_.reset(CreateMallocSpaceFromMemMap(
@@ -2007,17 +1993,9 @@ void Heap::TransitionCollector(CollectorType collector_type) {
             mem_map->Size(), name, true));
 #endif
 
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-        // if (kIsDebugBuild && kUseRosAlloc) {
-#else
         if (kIsDebugBuild && kUseRosAlloc) {
-#endif
           mem_map->Protect(PROT_NONE);
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-        // }
-#else
         }
-#endif
         mem_map.release();
       }
       break;

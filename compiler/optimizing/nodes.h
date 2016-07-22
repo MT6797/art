@@ -30,6 +30,9 @@
 #include "primitive.h"
 #include "utils/arena_bit_vector.h"
 #include "utils/growable_array.h"
+#ifdef MTK_ART_COMMON
+#include "optimizing_compiler_stats.h"
+#endif
 
 namespace art {
 
@@ -51,7 +54,7 @@ class LocationSummary;
 class SlowPathCode;
 class SsaBuilder;
 #ifdef MTK_ART_COMMON
-struct LoopStructure;
+class LoopStructure;
 #endif
 
 static const int kDefaultNumberOfBlocks = 8;
@@ -131,6 +134,7 @@ class HGraph : public ArenaObject<kArenaAllocMisc> {
         reverse_post_order_(arena, kDefaultNumberOfBlocks),
 #ifdef MTK_ART_COMMON
         cdg_reverse_post_order_(arena, kDefaultNumberOfBlocks),
+        enhanced_inlined_(false),
 #endif
         linear_order_(arena, kDefaultNumberOfBlocks),
         entry_block_(nullptr),
@@ -163,6 +167,21 @@ class HGraph : public ArenaObject<kArenaAllocMisc> {
 
   void AddBlock(HBasicBlock* block);
 #ifdef MTK_ART_COMMON
+  void SetEnhancedInlined() { enhanced_inlined_ = true; }
+  bool HasEnhancedInlined() { return enhanced_inlined_ == true; }
+  // The compilation stat can't be changed between init and access.
+  void InitRecordStat(MethodCompilationStat stat) {
+    record_stat_.first = stat;
+    record_stat_.second = 0;
+  }
+  void UpdateRecordStat(MethodCompilationStat stat, int32_t value) {
+    CHECK(stat == record_stat_.first);
+    record_stat_.second += value;
+  }
+  int32_t GetRecordStat(MethodCompilationStat stat) {
+    CHECK(stat == record_stat_.first);
+    return record_stat_.second;
+  }
   // Update the graph, reverse post order, loop information and Domination.
   void ChainAfter(HBasicBlock* at, HBasicBlock* succ);
 #endif
@@ -356,6 +375,8 @@ class HGraph : public ArenaObject<kArenaAllocMisc> {
 #ifdef MTK_ART_COMMON
   // List of blocks to perform a reverse post order tree traversal.
   GrowableArray<HBasicBlock*> cdg_reverse_post_order_;
+  bool enhanced_inlined_;
+  std::pair<MethodCompilationStat, int32_t> record_stat_;
 #endif
 
   // List of blocks to perform a linear order tree traversal.
@@ -954,7 +975,9 @@ class HLoopInformationOutwardIterator : public ValueObject {
 #define FOR_EACH_MTK_INSTRUCTION(M)                                     \
   M(ZeroBranch, Instruction)                                            \
   M(Mla, TernaryOperation)                                              \
-  M(Pow, BinaryOperation)
+  M(Pow, BinaryOperation)                                               \
+  M(VectorSplat, Instruction)                                           \
+  M(GetElementPtr, Instruction)
 #define FOR_MTK_TERNARY_INSTRUCTION(M)                                  \
   M(TernaryOperation, Instruction)
 #else
@@ -1243,10 +1266,19 @@ class SideEffects : public ValueObject {
     switch (type) {
       case Primitive::kPrimInt:
       case Primitive::kPrimFloat:
+#ifdef MTK_ART_COMMON
+      case Primitive::kVectorFloatx4:
+      case Primitive::kVectorInt32x4:
+      case Primitive::kVectorInt16x8:
+      case Primitive::kVectorInt8x16:
+#endif
         return TypeFlag(Primitive::kPrimInt, offset) |
                TypeFlag(Primitive::kPrimFloat, offset);
       case Primitive::kPrimLong:
       case Primitive::kPrimDouble:
+#ifdef MTK_ART_COMMON
+      case Primitive::kVectorDoublex2:
+#endif
         return TypeFlag(Primitive::kPrimLong, offset) |
                TypeFlag(Primitive::kPrimDouble, offset);
       default:
@@ -2153,6 +2185,42 @@ class HMla : public HTernaryOperation {
  private:
   DISALLOW_COPY_AND_ASSIGN(HMla);
 };
+
+// Return a vector value that contains \arg V broadcasted to NumElts elements.
+class HVectorSplat : public HExpression<1> {
+ public:
+  explicit HVectorSplat(Primitive::Type type, HInstruction* value)
+    : HExpression(type, SideEffects::None()) {
+    SetRawInputAt(0, value);
+  }
+
+  DECLARE_INSTRUCTION(VectorSplat);
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(HVectorSplat);
+};
+
+// Return a vector value that contains \arg V broadcasted to NumElts elements.
+class HGetElementPtr : public HExpression<2> {
+ public:
+  explicit HGetElementPtr(HInstruction* base, HInstruction* offset, Primitive::Type type)
+    : HExpression(Primitive::kPrimNot, SideEffects::None()),
+      component_type_(type) {
+    SetRawInputAt(0, base);
+    SetRawInputAt(1, offset);
+  }
+
+  Primitive::Type GetComponentType() {
+    return component_type_;
+  }
+
+  DECLARE_INSTRUCTION(GetElementPtr);
+
+ private:
+  const Primitive::Type component_type_;
+  DISALLOW_COPY_AND_ASSIGN(HGetElementPtr);
+};
+
 #endif
 
 class HCondition : public HBinaryOperation {
@@ -3520,7 +3588,12 @@ class HInstanceFieldSet : public HTemplateInstruction<2> {
 class HArrayGet : public HExpression<2> {
  public:
   HArrayGet(HInstruction* array, HInstruction* index, Primitive::Type type)
+#ifdef MTK_ART_COMMON
+      : HExpression(type, SideEffects::ArrayReadOfType(type)),
+        needs_addr_inc_(false) {
+#else
       : HExpression(type, SideEffects::ArrayReadOfType(type)) {
+#endif
     SetRawInputAt(0, array);
     SetRawInputAt(1, index);
   }
@@ -3544,10 +3617,17 @@ class HArrayGet : public HExpression<2> {
 
   HInstruction* GetArray() const { return InputAt(0); }
   HInstruction* GetIndex() const { return InputAt(1); }
+#ifdef MTK_ART_COMMON
+  void SetAddressIncremnt() { needs_addr_inc_ = true; }
+  bool NeedsAddressIncremnt() { return needs_addr_inc_; }
+#endif
 
   DECLARE_INSTRUCTION(ArrayGet);
 
  private:
+#ifdef MTK_ART_COMMON
+  bool needs_addr_inc_;
+#endif
   DISALLOW_COPY_AND_ASSIGN(HArrayGet);
 };
 
@@ -3561,7 +3641,12 @@ class HArraySet : public HTemplateInstruction<3> {
       : HTemplateInstruction(SideEffects::ArrayWriteOfType(expected_component_type)),
         dex_pc_(dex_pc),
         expected_component_type_(expected_component_type),
+#ifdef MTK_ART_COMMON
+        needs_type_check_(value->GetType() == Primitive::kPrimNot),
+        needs_addr_inc_(false) {
+#else
         needs_type_check_(value->GetType() == Primitive::kPrimNot) {
+#endif
     SetRawInputAt(0, array);
     SetRawInputAt(1, index);
     SetRawInputAt(2, value);
@@ -3602,12 +3687,20 @@ class HArraySet : public HTemplateInstruction<3> {
         : expected_component_type_;
   }
 
+#ifdef MTK_ART_COMMON
+  void SetAddressIncremnt() { needs_addr_inc_ = true; }
+  bool NeedsAddressIncremnt() { return needs_addr_inc_; }
+#endif
+
   DECLARE_INSTRUCTION(ArraySet);
 
  private:
   const uint32_t dex_pc_;
   const Primitive::Type expected_component_type_;
   bool needs_type_check_;
+#ifdef MTK_ART_COMMON
+  bool needs_addr_inc_;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(HArraySet);
 };

@@ -578,6 +578,7 @@ GvnDeadCodeEliminationTestLoop::GvnDeadCodeEliminationTestLoop()
   PrepareBasicBlocks(kLoopBbs);
 }
 
+#ifndef MTK_ART_COMMON
 TEST_F(GvnDeadCodeEliminationTestSimple, Rename1) {
   static const IFieldDef ifields[] = {
       { 0u, 1u, 0u, false, kDexMemAccessWord },
@@ -783,6 +784,7 @@ TEST_F(GvnDeadCodeEliminationTestSimple, Rename5) {
   EXPECT_EQ(4, mirs_[0].ssa_rep->defs[0]);
   EXPECT_EQ(3u, mirs_[0].dalvikInsn.vA);
 }
+#endif
 
 TEST_F(GvnDeadCodeEliminationTestSimple, Rename6) {
   static const MIRDef mirs[] = {

@@ -59,6 +59,15 @@ Location Mips64ReturnLocation(Primitive::Type return_type) {
 
     case Primitive::kPrimVoid:
       return Location();
+
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+      UNREACHABLE();
+#endif
   }
   UNREACHABLE();
 }
@@ -848,6 +857,13 @@ Location CodeGeneratorMIPS64::GetStackLocation(HLoadLocal* load) const {
     case Primitive::kPrimChar:
     case Primitive::kPrimShort:
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unexpected type " << type;
   }
 
@@ -1390,6 +1406,13 @@ void InstructionCodeGeneratorMIPS64::VisitArrayGet(HArrayGet* instruction) {
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << instruction->GetType();
       UNREACHABLE();
   }
@@ -1552,6 +1575,13 @@ void InstructionCodeGeneratorMIPS64::VisitArraySet(HArraySet* instruction) {
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << instruction->GetType();
       UNREACHABLE();
   }
@@ -2140,6 +2170,13 @@ void InstructionCodeGeneratorMIPS64::HandleFieldGet(HInstruction* instruction,
       load_type = kLoadUnsignedWord;
       break;
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << type;
       UNREACHABLE();
   }
@@ -2194,6 +2231,13 @@ void InstructionCodeGeneratorMIPS64::HandleFieldSet(HInstruction* instruction,
       store_type = kStoreDoubleword;
       break;
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << type;
       UNREACHABLE();
   }

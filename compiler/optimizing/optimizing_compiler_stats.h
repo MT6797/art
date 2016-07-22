@@ -53,6 +53,27 @@ enum MethodCompilationStat {
   kRemovedCheckedCast,
   kRemovedDeadInstruction,
   kRemovedNullCheck,
+#if MTK_ART_COMMON
+  kMtkFirstStat,
+  kMtkOptimizingOptStat1,
+  kMtkOptimizingOptStat2,
+  kMtkOptimizingOptStat3,
+  kMtkOptimizingOptStat4,
+  kMtkOptimizingOptStat5,
+  kMtkOptimizingOptStat6,
+  kMtkOptimizingOptStat7,
+  kMtkOptimizingOptStat8,
+  kMtkOptimizingOptStat9,
+  kMtkOptimizingOptStat10,
+  kMtkOptimizingOptStat11,
+  kMtkOptimizingOptStat12,
+  kMtkOptimizingOptStat13,
+  kMtkOptimizingOptStat14,
+  kMtkOptimizingOptStat15,
+  kMtkOptimizingOptStat16,
+  kMtkOptimizingOptStat17,
+  kMtkOptimizingOptStat18,
+#endif
   kLastStat
 };
 
@@ -84,14 +105,26 @@ class OptimizingCompilerStats {
       LOG(INFO) << oss.str();
 
       for (int i = 0; i < kLastStat; i++) {
-        if (compile_stats_[i] != 0) {
-          LOG(INFO) << PrintMethodCompilationStat(i) << ": " << compile_stats_[i];
+#ifdef MTK_ART_COMMON
+        if (i >= kMtkFirstStat) {
+          PrintMTKMethodCompilationStat(i);
+        } else {
+#endif
+          if (compile_stats_[i] != 0) {
+            LOG(INFO) << PrintMethodCompilationStat(i) << ": " << compile_stats_[i];
+          }
+#ifdef MTK_ART_COMMON
         }
+#endif
       }
     }
   }
 
  private:
+#ifdef MTK_ART_COMMON
+  void PrintMTKMethodCompilationStat(int stat) const;
+#endif
+
   std::string PrintMethodCompilationStat(int stat) const {
     switch (stat) {
       case kAttemptCompilation : return "kAttemptCompilation";

@@ -572,6 +572,13 @@ static void UnstartedMemoryPeek(
     case Primitive::kPrimDouble:
     case Primitive::kPrimVoid:
     case Primitive::kPrimNot:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Not in the Memory API: " << type;
       UNREACHABLE();
   }
@@ -641,6 +648,13 @@ static void UnstartedMemoryPeekArray(
     case Primitive::kPrimDouble:
     case Primitive::kPrimVoid:
     case Primitive::kPrimNot:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Not in the Memory API: " << type;
       UNREACHABLE();
   }

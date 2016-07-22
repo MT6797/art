@@ -61,19 +61,6 @@ MemMap* ZipEntry::ExtractToMemMap(const char* zip_filename, const char* entry_fi
                                                    error_msg));
   if (map.get() == nullptr) {
     DCHECK(!error_msg->empty());
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::string app_location = std::string(zip_filename);
-    std::size_t found = app_location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = app_location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      size_t temp_value = GetUncompressedLength();
-      LOG(FATAL) << "[MTK_DEX_ABORT] ZIP ExtractToMemMap MAP NOT CREATED. FAILED APP:" << app_location <<" GetUncompressedLength:" << temp_value;
-    }
-#endif
-
     return nullptr;
   }
 
@@ -81,21 +68,6 @@ MemMap* ZipEntry::ExtractToMemMap(const char* zip_filename, const char* entry_fi
                                         map->Begin(), map->Size());
   if (error) {
     *error_msg = std::string(ErrorCodeString(error));
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::string app_location = std::string(zip_filename);
-    std::size_t found = app_location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = app_location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      uint8_t* m_begin = map->Begin();
-      unsigned int m_size = (unsigned int)(map->Size());
-      LOG(FATAL) << "[MTK_DEX_ABORT] ZIP ExtractToMemMap NOT EXTRACTED. FAILED APP:"
-                 << app_location <<" MAP BEGIN:" << m_begin <<" MAP SIZE:"<< m_size;
-    }
-#endif
-
     return nullptr;
   }
 
@@ -139,18 +111,6 @@ ZipArchive* ZipArchive::OpenFromFd(int fd, const char* filename, std::string* er
   const int32_t error = OpenArchiveFd(fd, filename, &handle);
   if (error) {
     *error_msg = std::string(ErrorCodeString(error));
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::string app_location = std::string(filename);
-    std::size_t found = app_location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = app_location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] Open Zip File Failed. FAILED APP:" << app_location;
-    }
-#endif
-
     CloseArchive(handle);
     return nullptr;
   }

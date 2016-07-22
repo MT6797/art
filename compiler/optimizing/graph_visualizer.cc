@@ -100,6 +100,13 @@ class HGraphVisualizerPrinter : public HGraphVisitor {
       case Primitive::kPrimDouble: return 'd';
       case Primitive::kPrimNot: return 'l';
       case Primitive::kPrimVoid: return 'v';
+#ifdef MTK_ART_COMMON
+      case Primitive::kVectorDoublex2: return 'D';
+      case Primitive::kVectorFloatx4: return 'F';
+      case Primitive::kVectorInt32x4: return 'I';
+      case Primitive::kVectorInt16x8: return 'S';
+      case Primitive::kVectorInt8x16: return 'C';
+#endif
     }
     LOG(FATAL) << "Unreachable";
     return 'v';

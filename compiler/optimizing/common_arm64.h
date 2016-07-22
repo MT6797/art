@@ -85,9 +85,30 @@ static inline vixl::FPRegister SRegisterFrom(Location location) {
   return vixl::FPRegister::SRegFromCode(location.reg());
 }
 
+#ifdef MTK_ART_COMMON
+static inline vixl::FPRegister QRegisterFrom(Location location) {
+  DCHECK(location.IsFpuRegister());
+  return vixl::FPRegister::QRegFromCode(location.reg());
+}
+#endif
+
 static inline vixl::FPRegister FPRegisterFrom(Location location, Primitive::Type type) {
   DCHECK(Primitive::IsFloatingPointType(type));
+#ifdef MTK_ART_COMMON
+  switch (type) {
+    case Primitive::kPrimDouble:
+      return DRegisterFrom(location);
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+      return QRegisterFrom(location);
+    default:
+      return SRegisterFrom(location);
+  }
+#else
   return type == Primitive::kPrimDouble ? DRegisterFrom(location) : SRegisterFrom(location);
+#endif
 }
 
 static inline vixl::FPRegister OutputFPRegister(HInstruction* instr) {

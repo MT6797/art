@@ -428,6 +428,13 @@ Location CodeGeneratorX86::AllocateFreeRegister(Primitive::Type type) const {
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << type;
   }
 
@@ -547,6 +554,13 @@ Location CodeGeneratorX86::GetStackLocation(HLoadLocal* load) const {
     case Primitive::kPrimChar:
     case Primitive::kPrimShort:
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unexpected type " << load->GetType();
       UNREACHABLE();
   }
@@ -606,6 +620,13 @@ Location InvokeDexCallingConventionVisitorX86::GetNextLocation(Primitive::Type t
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unexpected parameter type " << type;
       break;
   }
@@ -1262,6 +1283,13 @@ void LocationsBuilderX86::HandleInvoke(HInvoke* invoke) {
       break;
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       break;
 
     case Primitive::kPrimDouble:
@@ -3342,6 +3370,13 @@ void InstructionCodeGeneratorX86::HandleFieldGet(HInstruction* instruction,
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << field_type;
       UNREACHABLE();
   }
@@ -3455,6 +3490,13 @@ void InstructionCodeGeneratorX86::HandleFieldSet(HInstruction* instruction,
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << field_type;
       UNREACHABLE();
   }
@@ -3522,6 +3564,22 @@ void LocationsBuilderX86::VisitMla(HMla* mla) {
 
 void InstructionCodeGeneratorX86::VisitMla(HMla* mla) {
   LOG(FATAL) << "Make compiler happy;" << mla;
+}
+
+void LocationsBuilderX86::VisitVectorSplat(HVectorSplat* instruction) {
+  LOG(FATAL) << "Make compiler happy;" << instruction;
+}
+
+void InstructionCodeGeneratorX86::VisitVectorSplat(HVectorSplat* instruction) {
+  LOG(FATAL) << "Make compiler happy;" << instruction;
+}
+
+void LocationsBuilderX86::VisitGetElementPtr(HGetElementPtr* instruction) {
+  LOG(FATAL) << "Make compiler happy;" << instruction;
+}
+
+void InstructionCodeGeneratorX86::VisitGetElementPtr(HGetElementPtr* instruction) {
+  LOG(FATAL) << "Make compiler happy;" << instruction;
 }
 #endif
 
@@ -3704,6 +3762,13 @@ void InstructionCodeGeneratorX86::VisitArrayGet(HArrayGet* instruction) {
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << type;
       UNREACHABLE();
   }
@@ -3921,6 +3986,13 @@ void InstructionCodeGeneratorX86::VisitArraySet(HArraySet* instruction) {
     }
 
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unreachable type " << instruction->GetType();
       UNREACHABLE();
   }

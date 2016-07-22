@@ -269,7 +269,7 @@ class ArtMethod FINAL {
                                             uint32_t name_and_signature_idx)
       SHARED_LOCKS_REQUIRED(Locks::mutator_lock_);
 
-#ifdef MTK_ART_COMMON
+#ifdef MTK_ART_PROFILER
   void ProfIntm();
 #endif
 

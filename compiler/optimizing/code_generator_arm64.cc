@@ -608,6 +608,13 @@ Location CodeGeneratorARM64::GetStackLocation(HLoadLocal* load) const {
     case Primitive::kPrimChar:
     case Primitive::kPrimShort:
     case Primitive::kPrimVoid:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       LOG(FATAL) << "Unexpected type " << type;
   }
 
@@ -844,6 +851,13 @@ void CodeGeneratorARM64::Load(Primitive::Type type,
     case Primitive::kPrimLong:
     case Primitive::kPrimFloat:
     case Primitive::kPrimDouble:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       DCHECK_EQ(dst.Is64Bits(), Primitive::Is64BitType(type));
       __ Ldr(dst, src);
       break;
@@ -893,6 +907,13 @@ void CodeGeneratorARM64::LoadAcquire(HInstruction* instruction,
       __ Ldar(Register(dst), base);
       MaybeRecordImplicitNullCheck(instruction);
       break;
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
     case Primitive::kPrimFloat:
     case Primitive::kPrimDouble: {
       DCHECK(dst.IsFPRegister());
@@ -926,6 +947,13 @@ void CodeGeneratorARM64::Store(Primitive::Type type,
     case Primitive::kPrimLong:
     case Primitive::kPrimFloat:
     case Primitive::kPrimDouble:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       DCHECK_EQ(src.Is64Bits(), Primitive::Is64BitType(type));
       __ Str(src, dst);
       break;
@@ -962,6 +990,13 @@ void CodeGeneratorARM64::StoreRelease(Primitive::Type type,
       DCHECK_EQ(src.Is64Bits(), Primitive::Is64BitType(type));
       __ Stlr(Register(src), base);
       break;
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
     case Primitive::kPrimFloat:
     case Primitive::kPrimDouble: {
       DCHECK(src.IsFPRegister());
@@ -1110,6 +1145,9 @@ enum UnimplementedInstructionBreakCode {
 #undef UNIMPLEMENTED_INSTRUCTION_BREAK_CODE
 #undef FOR_EACH_UNIMPLEMENTED_INSTRUCTION
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void LocationsBuilderARM64::HandleBinaryOp(HBinaryOperation* instr) {
   DCHECK_EQ(instr->InputCount(), 2U);
   LocationSummary* locations = new (GetGraph()->GetArena()) LocationSummary(instr);
@@ -1211,6 +1249,9 @@ void InstructionCodeGeneratorARM64::HandleFieldSet(HInstruction* instruction,
   }
 }
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void InstructionCodeGeneratorARM64::HandleBinaryOp(HBinaryOperation* instr) {
   Primitive::Type type = instr->GetType();
 
@@ -1338,6 +1379,9 @@ void LocationsBuilderARM64::VisitArrayGet(HArrayGet* instruction) {
   }
 }
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void InstructionCodeGeneratorARM64::VisitArrayGet(HArrayGet* instruction) {
   LocationSummary* locations = instruction->GetLocations();
   Primitive::Type type = instruction->GetType();
@@ -1397,6 +1441,9 @@ void LocationsBuilderARM64::VisitArraySet(HArraySet* instruction) {
   }
 }
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void InstructionCodeGeneratorARM64::VisitArraySet(HArraySet* instruction) {
   Primitive::Type value_type = instruction->GetComponentType();
   LocationSummary* locations = instruction->GetLocations();
@@ -2254,8 +2301,31 @@ void InstructionCodeGeneratorARM64::VisitMla(HMla* mla) {
       LOG(FATAL) << "Unexpected mla type " << mla->GetResultType();
   }
 }
+
+__attribute__((weak))
+void LocationsBuilderARM64::VisitVectorSplat(HVectorSplat* value) {
+  UNUSED(value);
+}
+
+__attribute__((weak))
+void InstructionCodeGeneratorARM64::VisitVectorSplat(HVectorSplat* value) {
+  UNUSED(value);
+}
+
+__attribute__((weak))
+void LocationsBuilderARM64::VisitGetElementPtr(HGetElementPtr* gep) {
+  UNUSED(gep);
+}
+
+__attribute__((weak))
+void InstructionCodeGeneratorARM64::VisitGetElementPtr(HGetElementPtr* gep) {
+  UNUSED(gep);
+}
 #endif
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void LocationsBuilderARM64::VisitMul(HMul* mul) {
   LocationSummary* locations =
       new (GetGraph()->GetArena()) LocationSummary(mul, LocationSummary::kNoCall);
@@ -2279,6 +2349,9 @@ void LocationsBuilderARM64::VisitMul(HMul* mul) {
   }
 }
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+#endif
 void InstructionCodeGeneratorARM64::VisitMul(HMul* mul) {
   switch (mul->GetResultType()) {
     case Primitive::kPrimInt:

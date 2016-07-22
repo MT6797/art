@@ -155,6 +155,9 @@ class ThreadList {
 
   bool Contains(Thread* thread) EXCLUSIVE_LOCKS_REQUIRED(Locks::thread_list_lock_);
   bool Contains(pid_t tid) EXCLUSIVE_LOCKS_REQUIRED(Locks::thread_list_lock_);
+#if MTK_ART_FIX_THREAD_LIST_MEM_LEAKAGE
+  std::list<Thread*>::iterator FindThread(Thread* thread) EXCLUSIVE_LOCKS_REQUIRED(Locks::thread_list_lock_);
+#endif
 
   void DumpUnattachedThreads(std::ostream& os)
       LOCKS_EXCLUDED(Locks::thread_list_lock_);

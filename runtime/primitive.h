@@ -46,6 +46,13 @@ class Primitive {
     kPrimFloat,
     kPrimDouble,
     kPrimVoid,
+#ifdef MTK_ART_COMMON
+    kVectorDoublex2,
+    kVectorFloatx4,
+    kVectorInt32x4,
+    kVectorInt16x8,
+    kVectorInt8x16,
+#endif
   };
 
   static Type GetType(char type) {
@@ -85,6 +92,13 @@ class Primitive {
       case kPrimLong:
       case kPrimDouble:  return 3;
       case kPrimNot:     return ComponentSizeShiftWidth(kObjectReferenceSize);
+#ifdef MTK_ART_COMMON
+      case kVectorInt8x16:  return 0;
+      case kVectorInt16x8:  return 1;
+      case kVectorInt32x4:  return 2;
+      case kVectorDoublex2: return 3;
+      case kVectorFloatx4:
+#endif
       default:
         LOG(FATAL) << "Invalid type " << static_cast<int>(type);
         return 0;
@@ -103,6 +117,13 @@ class Primitive {
       case kPrimLong:
       case kPrimDouble:  return 8;
       case kPrimNot:     return kObjectReferenceSize;
+#ifdef MTK_ART_COMMON
+      case kVectorInt8x16:  return 1;
+      case kVectorInt16x8:  return 2;
+      case kVectorFloatx4:
+      case kVectorInt32x4:  return 4;
+      case kVectorDoublex2: return 8;
+#endif
       default:
         LOG(FATAL) << "Invalid type " << static_cast<int>(type);
         return 0;
@@ -138,7 +159,14 @@ class Primitive {
   static const char* PrettyDescriptor(Type type);
 
   static bool IsFloatingPointType(Type type) {
+#ifdef MTK_ART_COMMON
+    return type == kPrimFloat ||
+           type == kPrimDouble ||
+           type == kVectorDoublex2 ||
+           type == kVectorFloatx4;
+#else
     return type == kPrimFloat || type == kPrimDouble;
+#endif
   }
 
   static bool IsIntegralType(Type type) {
@@ -164,6 +192,54 @@ class Primitive {
   static bool Is64BitType(Type type) {
     return type == kPrimLong || type == kPrimDouble;
   }
+
+#ifdef MTK_ART_COMMON
+  static size_t GetNumberElements(Type type) {
+    switch (type) {
+      case kVectorDoublex2:
+        return 2;
+      case kVectorFloatx4:
+      case kVectorInt32x4:
+        return 4;
+      case kVectorInt16x8:
+        return 8;
+      case kVectorInt8x16:
+        return 16;
+      default:
+        LOG(FATAL) << "Invalid type " << static_cast<int>(type);
+        return 0;
+    }
+  }
+
+  static Type GetElementType(Type type) {
+    switch (type) {
+      case kVectorDoublex2:
+        return kPrimDouble;
+      case kVectorFloatx4:
+        return kPrimFloat;
+      case kVectorInt32x4:
+      case kVectorInt16x8:
+      case kVectorInt8x16:
+        return kPrimInt;
+      default:
+        LOG(FATAL) << "Invalid type " << static_cast<int>(type);
+        return type;
+    }
+  }
+
+  static bool IsVectorType(Type type) {
+    switch (type) {
+      case kVectorDoublex2:
+      case kVectorFloatx4:
+      case kVectorInt32x4:
+      case kVectorInt16x8:
+      case kVectorInt8x16:
+          return true;
+      default:
+        return false;
+    }
+  }
+#endif
 
  private:
   DISALLOW_IMPLICIT_CONSTRUCTORS(Primitive);

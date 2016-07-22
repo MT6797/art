@@ -26,6 +26,7 @@
 #include "memory_region.h"
 #include "nodes.h"
 #include "stack_map_stream.h"
+#include "optimizing_compiler_stats.h"
 
 namespace art {
 
@@ -160,7 +161,11 @@ class CodeGenerator {
   virtual void Move(HInstruction* instruction, Location location, HInstruction* move_for) = 0;
   virtual Assembler* GetAssembler() = 0;
 #ifdef MTK_ART_COMMON
-  virtual void SetWrapperOption(CompilerDriver* compiler_driver) { UNUSED(compiler_driver); }
+  virtual void SetWrapperOption(CompilerDriver* compiler_driver,
+                                OptimizingCompilerStats* stats) {
+    UNUSED(compiler_driver);
+    UNUSED(stats);
+  }
   virtual CompilerDriver* GetCompilerDriver() { return nullptr; }
 #endif
   virtual size_t GetWordSize() const = 0;

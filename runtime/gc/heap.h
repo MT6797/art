@@ -116,12 +116,7 @@ enum HomogeneousSpaceCompactResult {
   kErrorVMShuttingDown,
 };
 
-// If true, use rosalloc/RosAllocSpace instead of dlmalloc/DlMallocSpace
-#if defined (HAVE_ANDROID_OS) && defined(MTK_JAVA_HEAP_USE_DLMALLOC)
-static constexpr bool kUseRosAlloc = false;
-#else
 static constexpr bool kUseRosAlloc = true;
-#endif
 
 // If true, use thread-local allocation stack.
 static constexpr bool kUseThreadLocalAllocationStack = true;

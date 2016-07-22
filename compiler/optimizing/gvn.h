@@ -26,8 +26,13 @@ class SideEffectsAnalysis;
 
 class GVNOptimization : public HOptimization {
  public:
+#ifdef MTK_ART_COMMON
+  GVNOptimization(HGraph* graph, const SideEffectsAnalysis& side_effects, OptimizingCompilerStats* stats = nullptr)
+      : HOptimization(graph, true, kGlobalValueNumberingPassName, stats), side_effects_(side_effects) {}
+#else
   GVNOptimization(HGraph* graph, const SideEffectsAnalysis& side_effects)
       : HOptimization(graph, true, kGlobalValueNumberingPassName), side_effects_(side_effects) {}
+#endif
 
   void Run() OVERRIDE;
 

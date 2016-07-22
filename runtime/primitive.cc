@@ -29,16 +29,31 @@ static const char* kTypeNames[] = {
   "PrimFloat",
   "PrimDouble",
   "PrimVoid",
+#ifdef MTK_ART_COMMON
+  "VectorDoublex2",
+  "VectorFloatx4",
+  "VectorInt32x4",
+  "VectorInt16x8",
+  "VectorInt8x16",
+#endif
 };
 
 const char* Primitive::PrettyDescriptor(Primitive::Type type) {
+#ifdef MTK_ART_COMMON
+  CHECK(Primitive::kPrimNot <= type && type <= Primitive::kVectorInt8x16) << static_cast<int>(type);
+#else
   CHECK(Primitive::kPrimNot <= type && type <= Primitive::kPrimVoid) << static_cast<int>(type);
+#endif
   return kTypeNames[type];
 }
 
 std::ostream& operator<<(std::ostream& os, const Primitive::Type& type) {
   int32_t int_type = static_cast<int32_t>(type);
+#ifdef MTK_ART_COMMON
+  if (type >= Primitive::kPrimNot && type <= Primitive::kVectorInt8x16) {
+#else
   if (type >= Primitive::kPrimNot && type <= Primitive::kPrimVoid) {
+#endif
     os << kTypeNames[int_type];
   } else {
     os << "Type[" << int_type << "]";

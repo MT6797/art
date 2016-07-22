@@ -855,6 +855,10 @@ X86Mir2Lir::X86Mir2Lir(CompilationUnit* cu, MIRGraph* mir_graph, ArenaAllocator*
   }
 }
 
+#ifdef MTK_ART_COMMON
+// Fix a vmtest, the test failed when the test is executed on host
+__attribute__((weak))
+#endif
 Mir2Lir* X86CodeGenerator(CompilationUnit* const cu, MIRGraph* const mir_graph,
                           ArenaAllocator* const arena) {
   return new X86Mir2Lir(cu, mir_graph, arena);

@@ -183,7 +183,11 @@ TEST_F(OatTest, OatHeaderSizeCheck) {
   EXPECT_EQ(72U, sizeof(OatHeader));
   EXPECT_EQ(4U, sizeof(OatMethodOffsets));
   EXPECT_EQ(28U, sizeof(OatQuickMethodHeader));
+#ifdef MTK_ART_COMMON
+  EXPECT_EQ(116 * GetInstructionSetPointerSize(kRuntimeISA), sizeof(QuickEntryPoints));
+#else
   EXPECT_EQ(112 * GetInstructionSetPointerSize(kRuntimeISA), sizeof(QuickEntryPoints));
+#endif
 }
 
 TEST_F(OatTest, OatHeaderIsValid) {

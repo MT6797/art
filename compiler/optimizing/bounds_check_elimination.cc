@@ -1847,13 +1847,10 @@ void BoundsCheckElimination::Run() {
 
 #ifdef MTK_ART_COMMON
   SwitchEnhanceBCE();
+  graph_->InitRecordStat(kMtkOptimizingOptStat8);
 #endif
 
-#ifdef MTK_ART_COMMON
-  BCEVisitor visitor(graph_, compiler_driver_);
-#else
   BCEVisitor visitor(graph_);
-#endif
   // Reverse post order guarantees a node's dominators are visited first.
   // We want to visit in the dominator-based order since if a value is known to
   // be bounded by a range at one instruction, it must be true that all uses of
@@ -1877,6 +1874,11 @@ void BoundsCheckElimination::Run() {
     visitor.VisitBasicBlock(current);
     last_visited_block = current;
   }
+
+#ifdef MTK_ART_COMMON
+  int32_t opted = graph_->GetRecordStat(kMtkOptimizingOptStat8);
+  MaybeRecordStat(kMtkOptimizingOptStat8, opted);
+#endif
 }
 
 }  // namespace art

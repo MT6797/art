@@ -129,18 +129,6 @@ bool DexFileVerifier::Verify(const DexFile* dex_file, const uint8_t* begin, size
   std::unique_ptr<DexFileVerifier> verifier(new DexFileVerifier(dex_file, begin, size, location));
   if (!verifier->Verify()) {
     *error_msg = verifier->FailureReason();
-
-#if defined(MTK_ART_DEX_ACTIVE_ABORT)
-    std::string app_location = std::string(location);
-    std::size_t found = app_location.find("/system/app", 0);
-    if (found == std::string::npos) {
-      found = app_location.find("/system/priv-app", 0);
-    }
-    if (found != std::string::npos) {
-      LOG(FATAL) << "[MTK_DEX_ABORT] DexFileVerifier::Verify Failed. FAILED APP:" << app_location;
-    }
-#endif
-
     return false;
   }
   return true;

@@ -702,11 +702,6 @@ class Runtime {
   ProfilerOptions profiler_options_;
   bool profiler_started_;
 
-#ifdef MTK_ART_PROFILER
-  void *perf_prof_handle_;
-  void *perf_prof_;
-#endif
-
   std::unique_ptr<TraceConfig> trace_config_;
 
   instrumentation::Instrumentation instrumentation_;
@@ -761,6 +756,11 @@ class Runtime {
 
   // Contains the build fingerprint, if given as a parameter.
   std::string fingerprint_;
+
+#ifdef MTK_ART_PROFILER
+  void *perf_prof_handle_;
+  void *perf_prof_;
+#endif
 
   #ifdef MTK_ARTSLIM_ENABLE
 

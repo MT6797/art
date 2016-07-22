@@ -716,6 +716,10 @@ bool OatFileAssistant::Dex2Oat(const std::vector<std::string>& args,
 
   if (!runtime->IsVerificationEnabled()) {
     argv.push_back("--compiler-filter=verify-none");
+#if MTK_ART_USE_INT_ON_DUALCORE
+  } else if (sysconf(_SC_NPROCESSORS_CONF) <= 2) {
+    argv.push_back("--compiler-filter=interpret-only");
+#endif
   }
 
   if (runtime->MustRelocateIfPossible()) {

@@ -41,7 +41,11 @@ namespace art {
 static bool CheckType(Primitive::Type type, Location location) {
   if (location.IsFpuRegister()
       || (location.IsUnallocated() && (location.GetPolicy() == Location::kRequiresFpuRegister))) {
+#ifdef MTK_ART_COMMON
+    return (type == Primitive::kPrimFloat) || (type == Primitive::kPrimDouble) || (type == Primitive::kVectorDoublex2);
+#else
     return (type == Primitive::kPrimFloat) || (type == Primitive::kPrimDouble);
+#endif
   } else if (location.IsRegister() ||
              (location.IsUnallocated() && (location.GetPolicy() == Location::kRequiresRegister))) {
     return Primitive::IsIntegralType(type) || (type == Primitive::kPrimNot);

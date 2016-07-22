@@ -1421,6 +1421,14 @@ class Dex2Oat FINAL {
       }
     }
 
+#if defined(MTK_ART_GMO_DEX2OAT_WHITELIST)
+    static constexpr size_t kGMOMinCompileDexSize = 4;
+    if (!image_ && dex_files_.size() > kGMOMinCompileDexSize) {
+      compiler_options_->SetCompilerFilter(CompilerOptions::kInterpretOnly);
+      LOG(INFO) << "Enable GMO Rules. Current Dex File Sizes:" << dex_files_.size();
+    }
+#endif
+
     return true;
   }
 

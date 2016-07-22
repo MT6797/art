@@ -1173,6 +1173,21 @@ bool GvnDeadCodeElimination::RecordMIR(MIR* mir) {
       must_keep = true;
       break;
 
+#ifdef MTK_ART_COMMON
+    case Instruction::MOVE_OBJECT:
+    case Instruction::MOVE_OBJECT_FROM16:
+    case Instruction::MOVE_OBJECT_16:
+      must_keep = true;
+      break;
+
+    case kMirOpCopy:
+    case Instruction::MOVE:
+    case Instruction::MOVE_FROM16:
+    case Instruction::MOVE_16:
+    case Instruction::MOVE_WIDE:
+    case Instruction::MOVE_WIDE_FROM16:
+    case Instruction::MOVE_WIDE_16: {
+#else
     case kMirOpCopy:
     case Instruction::MOVE:
     case Instruction::MOVE_FROM16:
@@ -1183,6 +1198,7 @@ bool GvnDeadCodeElimination::RecordMIR(MIR* mir) {
     case Instruction::MOVE_OBJECT:
     case Instruction::MOVE_OBJECT_FROM16:
     case Instruction::MOVE_OBJECT_16: {
+#endif
       is_move = true;
       // If the MIR defining src vreg is known, allow renaming all uses of src vreg to dest vreg
       // while updating the defining MIR to directly define dest vreg. However, changing Phi's

@@ -59,6 +59,13 @@ static void AddToListForLinearization(GrowableArray<HBasicBlock*>* worklist, HBa
   worklist->InsertAt(insert_at, block);
 }
 
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+Primitive::Type GetLIType(HInstruction* current) {
+  return current->GetType();
+}
+#endif
+
 void SsaLivenessAnalysis::LinearizeGraph() {
   // Create a reverse post ordering with the following properties:
   // - Blocks in a loop are consecutive,
@@ -142,8 +149,13 @@ void SsaLivenessAnalysis::NumberInstructions() {
       if (locations != nullptr && locations->Out().IsValid()) {
         instructions_from_ssa_index_.Add(current);
         current->SetSsaIndex(ssa_index++);
+#ifdef MTK_ART_COMMON
+        current->SetLiveInterval(
+            LiveInterval::MakeInterval(graph_->GetArena(), GetLIType(current), current));
+#else
         current->SetLiveInterval(
             LiveInterval::MakeInterval(graph_->GetArena(), current->GetType(), current));
+#endif
       }
       instructions_from_lifetime_position_.Add(current);
       current->SetLifetimePosition(lifetime_position);

@@ -244,7 +244,12 @@ void RegisterAllocator::ProcessInstruction(HInstruction* instruction) {
   }
 
   bool core_register = (instruction->GetType() != Primitive::kPrimDouble)
+#ifdef MTK_ART_COMMON
+      && (instruction->GetType() != Primitive::kPrimFloat)
+      && (!Primitive::IsVectorType(instruction->GetType()));
+#else
       && (instruction->GetType() != Primitive::kPrimFloat);
+#endif
 
   if (locations->CanCall()) {
     if (codegen_->IsLeafMethod()) {
@@ -1228,6 +1233,13 @@ void RegisterAllocator::AllocateSpillSlotFor(LiveInterval* interval) {
   GrowableArray<size_t>* spill_slots = nullptr;
   switch (interval->GetType()) {
     case Primitive::kPrimDouble:
+#ifdef MTK_ART_COMMON
+    case Primitive::kVectorDoublex2:
+    case Primitive::kVectorFloatx4:
+    case Primitive::kVectorInt32x4:
+    case Primitive::kVectorInt16x8:
+    case Primitive::kVectorInt8x16:
+#endif
       spill_slots = &double_spill_slots_;
       break;
     case Primitive::kPrimLong:
@@ -1696,6 +1708,13 @@ void RegisterAllocator::Resolve() {
       uint32_t slot = current->GetSpillSlot();
       switch (current->GetType()) {
         case Primitive::kPrimDouble:
+#ifdef MTK_ART_COMMON
+        case Primitive::kVectorDoublex2:
+        case Primitive::kVectorFloatx4:
+        case Primitive::kVectorInt32x4:
+        case Primitive::kVectorInt16x8:
+        case Primitive::kVectorInt8x16:
+#endif
           slot += long_spill_slots_.Size();
           FALLTHROUGH_INTENDED;
         case Primitive::kPrimLong:

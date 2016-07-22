@@ -1172,20 +1172,9 @@ class BCEVisitor : public HGraphVisitor {
     return block->GetBlockId() >= initial_block_size_;
   }
 
-#ifdef MTK_ART_COMMON
-  explicit BCEVisitor(HGraph* graph, CompilerDriver* compiler_driver)
-      : HGraphVisitor(graph), maps_(graph->GetBlocks().Size()),
-        need_to_revisit_block_(false), initial_block_size_(graph->GetBlocks().Size()),
-        compiler_driver_(compiler_driver) {}
-  explicit BCEVisitor(HGraph* graph)
-      : HGraphVisitor(graph), maps_(graph->GetBlocks().Size()),
-        need_to_revisit_block_(false), initial_block_size_(graph->GetBlocks().Size()),
-        compiler_driver_(nullptr) {}
-#else
   explicit BCEVisitor(HGraph* graph)
       : HGraphVisitor(graph), maps_(graph->GetBlocks().Size()),
         need_to_revisit_block_(false), initial_block_size_(graph->GetBlocks().Size()) {}
-#endif
 
   void VisitBasicBlock(HBasicBlock* block) OVERRIDE {
     DCHECK(!IsAddedBlock(block));
@@ -1202,7 +1191,6 @@ class BCEVisitor : public HGraphVisitor {
 
 #ifdef MTK_ART_COMMON
   void PropagateArrayRanges(HBasicBlock* block);
-  bool PreVisitBoundsCheck(HBoundsCheck* bounds_check);
 #endif
 
  private:
@@ -1461,12 +1449,6 @@ class BCEVisitor : public HGraphVisitor {
     DCHECK(array_length->IsIntConstant() ||
            array_length->IsArrayLength() ||
            array_length->IsPhi());
-
-#ifdef MTK_ART_COMMON
-    if (PreVisitBoundsCheck(bounds_check)) {
-      return;
-    }
-#endif
 
     if (array_length->IsPhi()) {
       // Input 1 of the phi contains the real array.length once the loop body is
@@ -1925,7 +1907,6 @@ class BCEVisitor : public HGraphVisitor {
   int32_t initial_block_size_;
 
 #ifdef MTK_ART_COMMON
-  CompilerDriver* const compiler_driver_;
   ArrayRangeList arr_rgn_list;
 #endif
 
@@ -1937,10 +1918,12 @@ class BCEVisitor : public HGraphVisitor {
 class BoundsCheckElimination : public HOptimization {
  public:
 #ifdef MTK_ART_COMMON
-  explicit BoundsCheckElimination(HGraph* graph, CompilerDriver* compiler_driver)
-      : HOptimization(graph, true, kBoundsCheckEliminiationPassName),
+  explicit BoundsCheckElimination(HGraph* graph, CompilerDriver* compiler_driver,
+                                  OptimizingCompilerStats* stats = nullptr)
+      : HOptimization(graph, true, kBoundsCheckEliminiationPassName, stats),
         compiler_driver_(compiler_driver) {}
 
+  // Make compiler happy for private data member initialization
   explicit BoundsCheckElimination(HGraph* graph)
       : HOptimization(graph, true, kBoundsCheckEliminiationPassName),
         compiler_driver_(nullptr) {}

@@ -417,7 +417,7 @@ CompiledMethod* OptimizingCompiler::CompileOptimized(HGraph* graph,
 
   CodeVectorAllocator allocator;
 #ifdef MTK_ART_COMMON
-  codegen->SetWrapperOption(compiler_driver);
+  codegen->SetWrapperOption(compiler_driver, compilation_stats_.get());
 #endif
   codegen->CompileOptimized(&allocator);
 
@@ -455,7 +455,7 @@ CompiledMethod* OptimizingCompiler::CompileBaseline(
     const DexCompilationUnit& dex_compilation_unit) const {
   CodeVectorAllocator allocator;
 #ifdef MTK_ART_COMMON
-  codegen->SetWrapperOption(compiler_driver);
+  codegen->SetWrapperOption(compiler_driver, compilation_stats_.get());
 #endif
   codegen->CompileBaseline(&allocator);
 
@@ -735,5 +735,11 @@ bool IsCompilingWithCoreImage() {
   const std::string& image = Runtime::Current()->GetImageLocation();
   return EndsWith(image, "core.art") || EndsWith(image, "core-optimizing.art");
 }
+
+#ifdef MTK_ART_COMMON
+__attribute__((weak))
+void OptimizingCompilerStats::PrintMTKMethodCompilationStat(int stat ATTRIBUTE_UNUSED) const {
+}
+#endif
 
 }  // namespace art
